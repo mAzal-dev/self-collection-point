@@ -1,72 +1,297 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Parcel Image Upload</title>
-  <style>
-    body {
-      font-family: sans-serif;
-      padding: 20px;
-      max-width: 500px;
-      margin: auto;
-    }
-    .preview {
-      margin-top: 10px;
-      max-width: 100%;
-    }
-    button, input {
-      margin-top: 10px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Photo Upload</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 1.1em;
+        }
+
+        .upload-section {
+            margin-bottom: 30px;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+            margin: 10px;
+        }
+
+        .file-input {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .upload-btn, .camera-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+            min-width: 180px;
+        }
+
+        .upload-btn {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+        }
+
+        .upload-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(76, 175, 80, 0.3);
+        }
+
+        .camera-btn {
+            background: linear-gradient(45deg, #2196F3, #1976D2);
+            color: white;
+        }
+
+        .camera-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(33, 150, 243, 0.3);
+        }
+
+        .preview-section {
+            margin-top: 30px;
+            display: none;
+        }
+
+        .preview-image {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .file-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            color: #333;
+        }
+
+        .drag-drop-area {
+            border: 3px dashed #ccc;
+            border-radius: 15px;
+            padding: 40px 20px;
+            margin: 20px 0;
+            transition: all 0.3s ease;
+            background: rgba(248, 249, 250, 0.5);
+        }
+
+        .drag-drop-area.dragover {
+            border-color: #4CAF50;
+            background: rgba(76, 175, 80, 0.1);
+            transform: scale(1.02);
+        }
+
+        .drag-text {
+            color: #666;
+            font-size: 1.1em;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 30px 20px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            .upload-btn, .camera-btn {
+                width: 100%;
+                margin: 5px 0;
+            }
+        }
+
+        .icon {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+    </style>
 </head>
 <body>
-  <h2>Upload Parcel Tag</h2>
-  
-  <input type="file" accept="image/*" capture="environment" id="cameraInput" />
-  <br>
-  <button onclick="uploadImage()">Upload</button>
+    <div class="container">
+        <h1>📸 Photo Upload</h1>
+        <p class="subtitle">Upload a photo from your device or take a new one</p>
+        
+        <div class="drag-drop-area" id="dragDropArea">
+            <div class="drag-text">Drag & drop your photo here</div>
+            <div class="upload-section">
+                <div class="file-input-wrapper">
+                    <input type="file" 
+                           id="fileInput" 
+                           class="file-input" 
+                           accept="image/*">
+                    <button class="upload-btn">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                        </svg>
+                        Choose File
+                    </button>
+                </div>
+                
+                <button class="camera-btn" id="cameraBtn">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M4,4H7L9,2H15L17,4H20A2,2 0 0,1 22,6V18A2,2 0 0,1 20,20H4A2,2 0 0,1 2,18V6A2,2 0 0,1 4,4M12,7A5,5 0 0,0 7,12A5,5 0 0,0 12,17A5,5 0 0,0 17,12A5,5 0 0,0 12,7M12,9A3,3 0 0,1 15,12A3,3 0 0,1 12,15A3,3 0 0,1 9,12A3,3 0 0,1 12,9Z"/>
+                    </svg>
+                    Take Photo
+                </button>
+            </div>
+        </div>
+        
+        <div class="preview-section" id="previewSection">
+            <img id="previewImage" class="preview-image" alt="Preview">
+            <div class="file-info" id="fileInfo"></div>
+        </div>
+    </div>
 
-  <img id="preview" class="preview" src="" alt="Image preview" />
+    <script>
+        const fileInput = document.getElementById('fileInput');
+        const cameraBtn = document.getElementById('cameraBtn');
+        const previewSection = document.getElementById('previewSection');
+        const previewImage = document.getElementById('previewImage');
+        const fileInfo = document.getElementById('fileInfo');
+        const dragDropArea = document.getElementById('dragDropArea');
 
-  <script>
-    let selectedFile;
+        // File input change handler
+        fileInput.addEventListener('change', handleFileSelect);
+        
+        // Camera button handler
+        cameraBtn.addEventListener('click', openCamera);
+        
+        // Drag and drop handlers
+        dragDropArea.addEventListener('dragover', handleDragOver);
+        dragDropArea.addEventListener('dragleave', handleDragLeave);
+        dragDropArea.addEventListener('drop', handleDrop);
 
-    const cameraInput = document.getElementById('cameraInput');
-    const preview = document.getElementById('preview');
-
-    cameraInput.addEventListener('change', function (e) {
-      selectedFile = e.target.files[0];
-      if (selectedFile) {
-        preview.src = URL.createObjectURL(selectedFile);
-      }
-    });
-
-    async function uploadImage() {
-      if (!selectedFile) {
-        alert("Please select or take a photo first.");
-        return;
-      }
-
-      const formData = new FormData();
-      formData.append("image", selectedFile);
-
-      try {
-        const res = await fetch("https://your-server-endpoint.com/upload", {
-          method: "POST",
-          body: formData
-        });
-
-        if (res.ok) {
-          alert("Image uploaded successfully!");
-        } else {
-          alert("Failed to upload.");
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file && file.type.startsWith('image/')) {
+                displayImage(file);
+            }
         }
-      } catch (err) {
-        console.error(err);
-        alert("Error uploading image.");
-      }
-    }
-  </script>
+
+        function openCamera() {
+            // Create a new input element for camera capture
+            const cameraInput = document.createElement('input');
+            cameraInput.type = 'file';
+            cameraInput.accept = 'image/*';
+            cameraInput.capture = 'environment'; // Use rear camera on mobile
+            
+            cameraInput.addEventListener('change', function(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    displayImage(file);
+                }
+            });
+            
+            cameraInput.click();
+        }
+
+        function displayImage(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewImage.src = e.target.result;
+                previewSection.style.display = 'block';
+                
+                // Display file information
+                const fileSize = (file.size / 1024 / 1024).toFixed(2);
+                fileInfo.innerHTML = `
+                    <strong>File:</strong> ${file.name}<br>
+                    <strong>Size:</strong> ${fileSize} MB<br>
+                    <strong>Type:</strong> ${file.type}
+                `;
+                
+                // Smooth scroll to preview
+                previewSection.scrollIntoView({ behavior: 'smooth' });
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function handleDragOver(event) {
+            event.preventDefault();
+            dragDropArea.classList.add('dragover');
+        }
+
+        function handleDragLeave(event) {
+            event.preventDefault();
+            dragDropArea.classList.remove('dragover');
+        }
+
+        function handleDrop(event) {
+            event.preventDefault();
+            dragDropArea.classList.remove('dragover');
+            
+            const files = event.dataTransfer.files;
+            if (files.length > 0 && files[0].type.startsWith('image/')) {
+                displayImage(files[0]);
+            }
+        }
+    </script>
 </body>
 </html>
