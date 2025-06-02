@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Parcel Image Upload</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+      max-width: 500px;
+      margin: auto;
+    }
+    .preview {
+      margin-top: 10px;
+      max-width: 100%;
+    }
+    button, input {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Upload Parcel Tag</h2>
+  
+  <input type="file" accept="image/*" capture="environment" id="cameraInput" />
+  <br>
+  <button onclick="uploadImage()">Upload</button>
+
+  <img id="preview" class="preview" src="" alt="Image preview" />
+
+  <script>
+    let selectedFile;
+
+    const cameraInput = document.getElementById('cameraInput');
+    const preview = document.getElementById('preview');
+
+    cameraInput.addEventListener('change', function (e) {
+      selectedFile = e.target.files[0];
+      if (selectedFile) {
+        preview.src = URL.createObjectURL(selectedFile);
+      }
+    });
+
+    async function uploadImage() {
+      if (!selectedFile) {
+        alert("Please select or take a photo first.");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("image", selectedFile);
+
+      try {
+        const res = await fetch("https://your-server-endpoint.com/upload", {
+          method: "POST",
+          body: formData
+        });
+
+        if (res.ok) {
+          alert("Image uploaded successfully!");
+        } else {
+          alert("Failed to upload.");
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Error uploading image.");
+      }
+    }
+  </script>
+</body>
+</html>
